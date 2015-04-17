@@ -5,83 +5,49 @@ import java.util.List;
 
 public class Neuron
 {
-    private List<Connection> m_connections;
+    private static final Double s_ETA = 0.0;
+    private static final Double s_ALPHA = 0.0;
+
     private Double m_outputValue;
-    private Double m_gradient;
+    private Double m_gradientValue;
+    private List<Connection> m_sourceConnections;
+    private List<Connection> m_targetConnections;
 
-    public Neuron(int numberOutputs)
+    public Neuron()
     {
-        // Create connections list:
-        m_connections = new ArrayList<>(numberOutputs);
     }
 
-    public void forwardPropagate(List<Neuron> previousLayerNeurons)
+    public void initialize()
     {
-        // http://en.wikipedia.org/wiki/Artificial_neuron#Types_of_transfer_functions
-
-        Double sum = 0.0;
-
-        // For each neuron of the previous layer:
-        for (Neuron neuron : previousLayerNeurons)
-        {
-            // Get connection between the previous layer neuron and this neuron:
-            Connection connection = neuron.getConnection(this);
-
-            // Add weight * output:
-            sum += neuron.getOutputValue() * connection.getWeight();
-        }
-
-        // Calculate output value using the transfer function:
-        m_outputValue = Neuron.transferFunction(sum);
-    }
-
-    public void calculateGradient(Double value)
-    {
-        m_gradient = value * Neuron.transferDerivativeFunction(m_outputValue);
-    }
-
-    public Double sumConnectionsGradient(Layer nextLayer)
-    {
-        Double sum = 0.0;
-
-        List<Neuron> neurons = nextLayer.getNeurons();
-        for(int i = 0; i < neurons.size(); i++)
-        {
-            Neuron neuron = neurons.get(i);
-
-            // Get connection to that neuron:
-            Connection connection = getConnection(neuron);
-
-            sum += connection.getWeight() * neuron.getGradient();
-        }
-
-        return sum;
+        m_outputValue = 0.0;
+        m_gradientValue = 0.0;
+        m_sourceConnections = new ArrayList<>();
+        m_targetConnections = new ArrayList<>();
     }
 
     public void addConnection(Connection connection)
     {
-        m_connections.add(connection);
+        if(connection.getSource() == this)
+            m_sourceConnections.add(connection);
+        else if(connection.getTarget() == this)
+            m_targetConnections.add(connection);
     }
 
-    public Connection getConnection(Neuron target)
+    public void calculateOutputValue()
     {
-        for (Connection connection : m_connections)
+        Double sum = 0.0;
+
+        for (Connection targetConnection : m_targetConnections)
         {
-            if(connection.getTarget() == target)
-                return connection;
+            Neuron sourceNeuron = targetConnection.getSource();
+            Double outputValue = sourceNeuron.getOutputValue();
+
+            Double weight = targetConnection.getWeight();
+
+            sum += outputValue * weight;
         }
 
-        return null;
-    }
-
-    public List<Connection> getConnections()
-    {
-        return m_connections;
-    }
-
-    public Double getGradient()
-    {
-        return m_gradient;
+        m_outputValue = Neuron.transferFunction(sum);
     }
 
     public Double getOutputValue()
@@ -92,6 +58,62 @@ public class Neuron
     public void setOutputValue(Double outputValue)
     {
         m_outputValue = outputValue;
+    }
+
+    public void calculateGradientValue(Double targetValue)
+    {
+        m_gradientValue = (targetValue - m_outputValue) * transferDerivativeFunction(m_outputValue);
+    }
+
+    public void calculateGradientValue()
+    {
+        Double sum = 0.0;
+
+        for (Connection sourceConnection : m_sourceConnections)
+        {
+            Neuron targetNeuron = sourceConnection.getTarget();
+            Double gradientValue = targetNeuron.getGradientValue();
+            Double connectionWeight = sourceConnection.getWeight();
+
+            sum += gradientValue * connectionWeight;
+        }
+
+        m_gradientValue = sum * transferDerivativeFunction(m_outputValue);
+    }
+
+    public Double getGradientValue()
+    {
+        return m_gradientValue;
+    }
+
+    public void updateConnectionsWeights()
+    {
+        for (Connection targetConnection : m_targetConnections)
+        {
+            Neuron sourceNeuron = targetConnection.getSource();
+
+            Double oldDeltaWeight = targetConnection.getDeltaWeight();
+            Double newDeltaWeight =
+                    Neuron.s_ETA * sourceNeuron.getOutputValue() * m_gradientValue +
+                            Neuron.s_ALPHA * oldDeltaWeight;
+
+            // Set new delta weight:
+            targetConnection.setDeltaWeight(newDeltaWeight);
+
+            // Set new weight:
+            Double oldWeight = targetConnection.getWeight();
+            targetConnection.setWeight(oldWeight + newDeltaWeight);
+        }
+    }
+
+    public List<Connection> getSourceConnections()
+    {
+        return m_sourceConnections;
+    }
+
+    public List<Connection> getTargetConnections()
+    {
+        return m_targetConnections;
     }
 
     private static Double transferFunction(Double x)

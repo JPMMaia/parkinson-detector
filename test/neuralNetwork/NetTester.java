@@ -8,13 +8,14 @@ import java.util.List;
 
 public class NetTester
 {
-    private static List<Integer> s_TOPOLOGY_1 = Arrays.asList(3, 5, 1);
+    private static List<Integer> s_TOPOLOGY_1 = Arrays.asList(3, 5, 7, 8,  1);
 
     @Test
     public void testInitialize()
     {
         // Create net:
-        Net net = new Net(s_TOPOLOGY_1);
+        Net net = new Net();
+        net.initialize(s_TOPOLOGY_1);
 
         // Get layers:
         List<Layer> layers = net.getLayers();
@@ -35,12 +36,18 @@ public class NetTester
             for (Neuron neuron : neurons)
             {
                 // Get connections of neuron:
-                List<Connection> connections = neuron.getConnections();
+                List<Connection> sourceConnections = neuron.getSourceConnections();
+                List<Connection> targetConnections = neuron.getTargetConnections();
+
+                if(i == 0)
+                    Assert.assertEquals(0, targetConnections.size());
+                else
+                    Assert.assertEquals((int) s_TOPOLOGY_1.get(i - 1), targetConnections.size());
 
                 if (i == layers.size() - 1)
-                    Assert.assertEquals(0, connections.size());
+                    Assert.assertEquals(0, sourceConnections.size());
                 else
-                    Assert.assertEquals((int) s_TOPOLOGY_1.get(i + 1), connections.size());
+                    Assert.assertEquals((int) s_TOPOLOGY_1.get(i + 1), sourceConnections.size());
             }
         }
     }

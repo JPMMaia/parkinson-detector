@@ -5,65 +5,83 @@ import java.util.List;
 
 public class Layer
 {
-    protected List<Neuron> m_neurons;
+    private List<Neuron> m_neurons;
 
-    public Layer(int numberNeurons, int numberOutputs)
+    public Layer()
     {
-        // Create neurons list:
+    }
+
+    public Boolean initialize(Integer numberNeurons)
+    {
         m_neurons = new ArrayList<>(numberNeurons);
+
+        for (int i = 0; i < numberNeurons; i++)
+        {
+            Neuron neuron = new Neuron();
+            neuron.initialize();
+
+            m_neurons.add(neuron);
+        }
+
+        return true;
+    }
+
+    public void initialize(Integer numberNeurons, Layer previousLayer)
+    {
+        m_neurons = new ArrayList<>(numberNeurons);
+        List<Neuron> previousNeurons = previousLayer.getNeurons();
+
         for(int i = 0; i < numberNeurons; i++)
-            m_neurons.add(new Neuron(numberOutputs));
-    }
-
-    protected void forwardPropagate(Layer previousLayer)
-    {
-        // Get previous layer neurons:
-        List<Neuron> previousLayerNeurons = previousLayer.getNeurons();
-
-        // For each neuron in this layer:
-        for (Neuron neuron : m_neurons)
         {
-            // Forward propagate:
-            neuron.forwardPropagate(previousLayerNeurons);
-        }
-    }
+            Neuron currentNeuron = new Neuron();
+            currentNeuron.initialize();
 
-    public void setOutputValues(List<Double> inputValues)
-    {
-        // For each input layer neuron, set the input value:
-        for (int i = 0; i < inputValues.size(); i++)
-        {
-            Neuron inputNeuron = m_neurons.get(i);
-            Double inputValue = inputValues.get(i);
-
-            inputNeuron.setOutputValue(inputValue);
-        }
-    }
-
-    public void createConnections(Layer nextLayer)
-    {
-        for (Neuron neuron : m_neurons)
-        {
-            for (Neuron nextLayerNeuron : nextLayer.getNeurons())
+            for(Neuron previousNeuron : previousNeurons)
             {
-                // Create a connection between the neuron and next layer neuron with a random weight:
-                Connection connection = new Connection(neuron, nextLayerNeuron, Random.getRandomWeight());
+                Connection connection = new Connection();
+                connection.initialize(previousNeuron, currentNeuron, Random.getRandomWeight());
 
-                // Add connection to neuron:
-                neuron.addConnection(connection);
+                previousNeuron.addConnection(connection);
+                currentNeuron.addConnection(connection);
             }
+
+            m_neurons.add(currentNeuron);
         }
+    }
+
+    public void calculateOutputValues()
+    {
+        for (Neuron neuron : m_neurons)
+        {
+            neuron.calculateOutputValue();
+        }
+    }
+
+    public boolean setOutputValues(List<Double> outputValues)
+    {
+        if(outputValues.size() != m_neurons.size())
+            return false;
+
+        for(int i = 0; i < outputValues.size(); i++)
+        {
+            Double outputValue = outputValues.get(i);
+            Neuron neuron = m_neurons.get(i);
+
+            neuron.setOutputValue(outputValue);
+        }
+
+        return true;
     }
 
     public Double calculateCost(List<Double> targetValues)
     {
-        // http://en.wikipedia.org/wiki/Backpropagation#Derivation
         Double cost = 0.0;
 
-        for(int i = 0; i < m_neurons.size(); i++)
+        for(int i = 0; i < targetValues.size(); i++)
         {
+            Neuron neuron = m_neurons.get(i);
             Double targetValue = targetValues.get(i);
-            Double outputValue = m_neurons.get(i).getOutputValue();
+            Double outputValue = neuron.getOutputValue();
 
             Double delta = targetValue - outputValue;
             cost += delta * delta;
@@ -74,9 +92,32 @@ public class Layer
         return cost;
     }
 
-    public void addNeuron(Neuron neuron)
+    public void calculateGradientValues(List<Double> targetValues)
     {
-        m_neurons.add(neuron);
+        for (int i = 0; i < m_neurons.size(); i++)
+        {
+            Neuron neuron = m_neurons.get(i);
+            Double targeValue = targetValues.get(i);
+
+            // Calculate neuron gradient using the target value:
+            neuron.calculateGradientValue(targeValue);
+        }
+    }
+
+    public void calculateGradientValues()
+    {
+        for (Neuron neuron : m_neurons)
+        {
+            neuron.calculateGradientValue();
+        }
+    }
+
+    public void updateConnectionsWeights()
+    {
+        for (Neuron neuron : m_neurons)
+        {
+            neuron.updateConnectionsWeights();
+        }
     }
 
     public List<Neuron> getNeurons()
