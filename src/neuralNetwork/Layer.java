@@ -7,11 +7,7 @@ public class Layer
 {
     private List<Neuron> m_neurons;
 
-    public Layer()
-    {
-    }
-
-    public Boolean initialize(Integer numberNeurons)
+    public void initialize(Integer numberNeurons)
     {
         m_neurons = new ArrayList<>(numberNeurons);
 
@@ -22,8 +18,6 @@ public class Layer
 
             m_neurons.add(neuron);
         }
-
-        return true;
     }
 
     public void initialize(Integer numberNeurons, Layer previousLayer)
@@ -51,10 +45,7 @@ public class Layer
 
     public void calculateOutputValues()
     {
-        for (Neuron neuron : m_neurons)
-        {
-            neuron.calculateOutputValue();
-        }
+        m_neurons.forEach(Neuron::calculateOutputValue);
     }
 
     public boolean setOutputValues(List<Double> outputValues)
@@ -97,27 +88,21 @@ public class Layer
         for (int i = 0; i < m_neurons.size(); i++)
         {
             Neuron neuron = m_neurons.get(i);
-            Double targeValue = targetValues.get(i);
+            Double targetValue = targetValues.get(i);
 
             // Calculate neuron gradient using the target value:
-            neuron.calculateGradientValue(targeValue);
+            neuron.calculateGradientValue(targetValue);
         }
     }
 
     public void calculateGradientValues()
     {
-        for (Neuron neuron : m_neurons)
-        {
-            neuron.calculateGradientValue();
-        }
+        m_neurons.forEach(Neuron::calculateGradientValue);
     }
 
     public void updateConnectionsWeights()
     {
-        for (Neuron neuron : m_neurons)
-        {
-            neuron.updateConnectionsWeights();
-        }
+        m_neurons.forEach(Neuron::updateConnectionsWeights);
     }
 
     public List<Neuron> getNeurons()

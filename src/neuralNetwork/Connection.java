@@ -7,15 +7,11 @@ public class Connection
     private Double m_weight;
     private Double m_deltaWeight;
 
-    public Connection()
-    {
-    }
-
     public void initialize(Neuron source, Neuron target, Double weight)
     {
         m_source = source;
         m_target = target;
-        weight = weight;
+        m_weight = weight;
         m_deltaWeight = 0.0;
     }
 

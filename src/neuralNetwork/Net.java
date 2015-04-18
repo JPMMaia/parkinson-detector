@@ -57,7 +57,7 @@ public class Net
         Layer outputLayer = getOutputLayer();
 
         // Calculate output layer cost:
-        Double cost = outputLayer.calculateCost(targetValues);
+        // Double cost = outputLayer.calculateCost(targetValues);
 
         // Calculate output layer gradients:
         outputLayer.calculateGradientValues(targetValues);

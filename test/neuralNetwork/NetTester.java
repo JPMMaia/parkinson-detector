@@ -8,7 +8,7 @@ import java.util.List;
 
 public class NetTester
 {
-    private static List<Integer> s_TOPOLOGY_1 = Arrays.asList(3, 5, 7, 8,  1);
+    private final static List<Integer> s_TOPOLOGY_1 = Arrays.asList(3, 5, 7, 8,  1);
 
     @Test
     public void testInitialize()
