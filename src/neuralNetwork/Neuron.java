@@ -122,8 +122,8 @@ public class Neuron
         return 1 / (1 + Math.pow(Math.E, -x));
     }
 
-    private static Double transferDerivativeFunction(Double x)
+    private static Double transferDerivativeFunction(Double outputValue)
     {
-        return x * (1 - x);
+        return outputValue * (1 - outputValue);
     }
 }
