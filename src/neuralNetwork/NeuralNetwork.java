@@ -3,11 +3,11 @@ package neuralNetwork;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Net
+public class NeuralNetwork
 {
     private List<Layer> m_layers;
 
-    public Net()
+    public NeuralNetwork()
     {
     }
 
@@ -71,11 +71,20 @@ public class Net
         }
 
         // Update all connection weights:
+        /*
         for (int i = m_layers.size() - 1; i > 0; i--)
         {
             Layer currentLayer = m_layers.get(i);
             currentLayer.updateConnectionsWeights();
         }
+        */
+
+        for (int i = m_layers.size() - 2; i >= 0; i--)
+        {
+            Layer currentLayer = m_layers.get(i);
+            currentLayer.updateConnectionsWeights();
+        }
+
     }
 
     public List<Layer> getLayers()

@@ -47,7 +47,7 @@ public class Neuron
             sum += outputValue * weight;
         }
 
-        m_outputValue = Neuron.transferFunction(sum);
+        m_outputValue = Neuron.sigmoidFunction(sum);
     }
 
     public Double getOutputValue()
@@ -60,25 +60,32 @@ public class Neuron
         m_outputValue = outputValue;
     }
 
+    // If its a neuron on an Output Layer:
     public void calculateGradientValue(Double targetValue)
     {
-        m_gradientValue = (targetValue - m_outputValue) * transferDerivativeFunction(m_outputValue);
+        m_gradientValue = (targetValue - m_outputValue) * sigmoidDerivativeFunction(m_outputValue);
     }
 
+    // In the other cases:
     public void calculateGradientValue()
     {
         Double sum = 0.0;
 
-        for (Connection sourceConnection : m_sourceConnections)
+        for (Connection targetConnection : m_targetConnections)
         {
-            Neuron targetNeuron = sourceConnection.getTarget();
-            Double gradientValue = targetNeuron.getGradientValue();
-            Double connectionWeight = sourceConnection.getWeight();
+            // Get the gradient of the target neuron:
+            Neuron targetNeuron = targetConnection.getTarget();
+            Double targetGradientValue = targetNeuron.getGradientValue();
 
-            sum += gradientValue * connectionWeight;
+            // Get the connection weight:
+            Double connectionWeight = targetConnection.getWeight();
+
+            // Sum all the gradient*connection
+            sum += targetGradientValue * connectionWeight;
         }
 
-        m_gradientValue = sum * transferDerivativeFunction(m_outputValue);
+        // The gradient value for this neuron:
+        m_gradientValue = sum * sigmoidDerivativeFunction(m_outputValue);
     }
 
     public Double getGradientValue()
@@ -88,14 +95,33 @@ public class Neuron
 
     public void updateConnectionsWeights()
     {
+        /*
         for (Connection targetConnection : m_targetConnections)
         {
             Neuron sourceNeuron = targetConnection.getSource();
 
             Double oldDeltaWeight = targetConnection.getDeltaWeight();
             Double newDeltaWeight =
-                    Neuron.s_ETA * sourceNeuron.getOutputValue() * m_gradientValue +
-                            Neuron.s_ALPHA * oldDeltaWeight;
+                    Neuron.s_ETA * sourceNeuron.getOutputValue() * m_gradientValue // Overall learning rate [0, 1]
+                            + Neuron.s_ALPHA * oldDeltaWeight; // alpha = momentum [0, n]
+
+            // Set new delta weight:
+            targetConnection.setDeltaWeight(newDeltaWeight);
+
+            // Set new weight:
+            Double oldWeight = targetConnection.getWeight();
+            targetConnection.setWeight(oldWeight + newDeltaWeight);
+        }
+        */
+
+        for (Connection targetConnection : m_targetConnections)
+        {
+            double targetGradient = targetConnection.getTarget().getGradientValue();
+
+            Double oldDeltaWeight = targetConnection.getDeltaWeight();
+            Double newDeltaWeight =
+                    Neuron.s_ETA * m_outputValue * targetGradient // Overall learning rate [0, 1]
+                            + Neuron.s_ALPHA * oldDeltaWeight; // alpha = momentum [0, n]
 
             // Set new delta weight:
             targetConnection.setDeltaWeight(newDeltaWeight);
@@ -116,13 +142,14 @@ public class Neuron
         return m_targetConnections;
     }
 
-    private static Double transferFunction(Double x)
+    private static Double sigmoidFunction(Double x)
     {
         // http://en.wikipedia.org/wiki/Backpropagation#Derivation
         return 1 / (1 + Math.pow(Math.E, -x));
     }
 
-    private static Double transferDerivativeFunction(Double outputValue)
+    // Note: outputValue already comes as outputValue = sigmoideFunction(x)
+    private static Double sigmoidDerivativeFunction(Double outputValue)
     {
         return outputValue * (1 - outputValue);
     }

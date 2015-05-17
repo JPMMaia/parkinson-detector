@@ -14,7 +14,7 @@ public class NetTester
     public void testInitialize()
     {
         // Create net:
-        Net net = new Net();
+        NeuralNetwork net = new NeuralNetwork();
         net.initialize(s_TOPOLOGY_1);
 
         // Get layers:

@@ -83,6 +83,7 @@ public class Layer
         return cost;
     }
 
+    // If its a neuron on an Output Layer:
     public void calculateGradientValues(List<Double> targetValues)
     {
         for (int i = 0; i < m_neurons.size(); i++)
@@ -95,6 +96,7 @@ public class Layer
         }
     }
 
+    // In the other cases:
     public void calculateGradientValues()
     {
         m_neurons.forEach(Neuron::calculateGradientValue);
