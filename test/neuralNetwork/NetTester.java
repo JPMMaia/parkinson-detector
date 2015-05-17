@@ -36,8 +36,8 @@ public class NetTester
             for (Neuron neuron : neurons)
             {
                 // Get connections of neuron:
-                List<Connection> sourceConnections = neuron.getSourceConnections();
-                List<Connection> targetConnections = neuron.getTargetConnections();
+                List<Connection> sourceConnections = neuron.getNextLayerConnections();
+                List<Connection> targetConnections = neuron.getPreviousLayerConnections();
 
                 if(i == 0)
                     Assert.assertEquals(0, targetConnections.size());

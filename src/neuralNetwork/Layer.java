@@ -1,5 +1,8 @@
 package neuralNetwork;
 
+import neuralNetwork.utils.IWeightAssigner;
+import neuralNetwork.utils.RandomAssigner;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +23,7 @@ public class Layer
         }
     }
 
-    public void initialize(Integer numberNeurons, Layer previousLayer)
+    public void initialize(Integer numberNeurons, Layer previousLayer, IWeightAssigner initialWeightAssigner)
     {
         m_neurons = new ArrayList<>(numberNeurons);
         List<Neuron> previousNeurons = previousLayer.getNeurons();
@@ -33,7 +36,7 @@ public class Layer
             for(Neuron previousNeuron : previousNeurons)
             {
                 Connection connection = new Connection();
-                connection.initialize(previousNeuron, currentNeuron, Random.getRandomWeight());
+                connection.initialize(previousNeuron, currentNeuron, initialWeightAssigner.assignWeight());
 
                 previousNeuron.addConnection(connection);
                 currentNeuron.addConnection(connection);
@@ -86,6 +89,9 @@ public class Layer
     // If its a neuron on an Output Layer:
     public void calculateGradientValues(List<Double> targetValues)
     {
+        if (targetValues.size() != m_neurons.size())
+            throw new IllegalArgumentException("Error in gradient calculation in output nodes: number of target values doesn't match the number of nodes in the output layer!");
+
         for (int i = 0; i < m_neurons.size(); i++)
         {
             Neuron neuron = m_neurons.get(i);

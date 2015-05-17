@@ -1,14 +1,20 @@
 package neuralNetwork;
 
+import neuralNetwork.utils.IWeightAssigner;
+import neuralNetwork.utils.RandomAssigner;
+import neuralNetwork.utils.TestAssigner;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class NeuralNetwork
 {
     private List<Layer> m_layers;
+    private IWeightAssigner m_initialWeightAssigner;
 
     public NeuralNetwork()
     {
+        m_initialWeightAssigner = new RandomAssigner(); // The default one!
     }
 
     public void initialize(List<Integer> topology)
@@ -28,7 +34,7 @@ public class NeuralNetwork
             int numberNeurons = topology.get(i);
 
             Layer layer = new Layer();
-            layer.initialize(numberNeurons, previousLayer);
+            layer.initialize(numberNeurons, previousLayer, m_initialWeightAssigner);
 
             // Add new layer to the list:
             m_layers.add(layer);
@@ -37,19 +43,17 @@ public class NeuralNetwork
         }
     }
 
-    public boolean feedForward(List<Double> inputValues)
+    public void feedForward(List<Double> inputValues)
     {
         Layer inputLayer = getInputLayer();
         if(!inputLayer.setOutputValues(inputValues))
-            return false;
+            throw new IllegalArgumentException("Error in feedForward algorithm: inputValues do not match the number of input nodes");
 
         for(int i = 1; i < m_layers.size(); i++)
         {
             Layer layer = m_layers.get(i);
             layer.calculateOutputValues();
         }
-
-        return true;
     }
 
     public void backPropagate(List<Double> targetValues)
@@ -92,13 +96,18 @@ public class NeuralNetwork
         return m_layers;
     }
 
-    private Layer getInputLayer()
+    public Layer getInputLayer()
     {
         return m_layers.get(0);
     }
 
-    private Layer getOutputLayer()
+    public Layer getOutputLayer()
     {
         return m_layers.get(m_layers.size() - 1);
+    }
+
+    public void setWeightAssigner(IWeightAssigner testAssigner)
+    {
+        m_initialWeightAssigner = testAssigner;
     }
 }

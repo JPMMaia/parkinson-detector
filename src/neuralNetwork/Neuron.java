@@ -5,13 +5,13 @@ import java.util.List;
 
 public class Neuron
 {
-    private static final Double s_ETA = 0.0;
-    private static final Double s_ALPHA = 0.0;
+    private static final Double s_learningRate = 0.4;
+    private static final Double s_momentum = 0.8;
 
     private Double m_outputValue;
     private Double m_gradientValue;
-    private List<Connection> m_sourceConnections;
-    private List<Connection> m_targetConnections;
+    private List<Connection> m_nextLayerConnections;
+    private List<Connection> m_previousLayerConnections;
 
     public Neuron()
     {
@@ -21,28 +21,28 @@ public class Neuron
     {
         m_outputValue = 0.0;
         m_gradientValue = 0.0;
-        m_sourceConnections = new ArrayList<>();
-        m_targetConnections = new ArrayList<>();
+        m_nextLayerConnections = new ArrayList<>();
+        m_previousLayerConnections = new ArrayList<>();
     }
 
     public void addConnection(Connection connection)
     {
         if(connection.getSource() == this)
-            m_sourceConnections.add(connection);
+            m_nextLayerConnections.add(connection);
         else if(connection.getTarget() == this)
-            m_targetConnections.add(connection);
+            m_previousLayerConnections.add(connection);
     }
 
     public void calculateOutputValue()
     {
         Double sum = 0.0;
 
-        for (Connection targetConnection : m_targetConnections)
+        for (Connection previousLayerConnection : m_previousLayerConnections)
         {
-            Neuron sourceNeuron = targetConnection.getSource();
+            Neuron sourceNeuron = previousLayerConnection.getSource();
             Double outputValue = sourceNeuron.getOutputValue();
 
-            Double weight = targetConnection.getWeight();
+            Double weight = previousLayerConnection.getWeight();
 
             sum += outputValue * weight;
         }
@@ -71,14 +71,13 @@ public class Neuron
     {
         Double sum = 0.0;
 
-        for (Connection targetConnection : m_targetConnections)
+        for (Connection nextLayerConnection : m_nextLayerConnections)
         {
             // Get the gradient of the target neuron:
-            Neuron targetNeuron = targetConnection.getTarget();
-            Double targetGradientValue = targetNeuron.getGradientValue();
+            Double targetGradientValue = nextLayerConnection.getTarget().getGradientValue();
 
             // Get the connection weight:
-            Double connectionWeight = targetConnection.getWeight();
+            Double connectionWeight = nextLayerConnection.getWeight();
 
             // Sum all the gradient*connection
             sum += targetGradientValue * connectionWeight;
@@ -96,14 +95,14 @@ public class Neuron
     public void updateConnectionsWeights()
     {
         /*
-        for (Connection targetConnection : m_targetConnections)
+        for (Connection targetConnection : m_previousLayerConnections)
         {
             Neuron sourceNeuron = targetConnection.getSource();
 
             Double oldDeltaWeight = targetConnection.getDeltaWeight();
             Double newDeltaWeight =
-                    Neuron.s_ETA * sourceNeuron.getOutputValue() * m_gradientValue // Overall learning rate [0, 1]
-                            + Neuron.s_ALPHA * oldDeltaWeight; // alpha = momentum [0, n]
+                    Neuron.s_learningRate * sourceNeuron.getOutputValue() * m_gradientValue // Overall learning rate [0, 1]
+                            + Neuron.s_momentum * oldDeltaWeight; // alpha = momentum [0, n]
 
             // Set new delta weight:
             targetConnection.setDeltaWeight(newDeltaWeight);
@@ -114,32 +113,31 @@ public class Neuron
         }
         */
 
-        for (Connection targetConnection : m_targetConnections)
+        for (Connection nextLayerConnection : m_nextLayerConnections)
         {
-            double targetGradient = targetConnection.getTarget().getGradientValue();
+            double targetGradient = nextLayerConnection.getTarget().getGradientValue();
 
-            Double oldDeltaWeight = targetConnection.getDeltaWeight();
-            Double newDeltaWeight =
-                    Neuron.s_ETA * m_outputValue * targetGradient // Overall learning rate [0, 1]
-                            + Neuron.s_ALPHA * oldDeltaWeight; // alpha = momentum [0, n]
+            Double oldWeight = nextLayerConnection.getWeight();
+            Double deltaWeight = nextLayerConnection.getDeltaWeight();
 
-            // Set new delta weight:
-            targetConnection.setDeltaWeight(newDeltaWeight);
+            Double newWeight =
+                    oldWeight
+                    + (Neuron.s_learningRate * m_outputValue * targetGradient) // Overall learning rate [0, 1]
+                    + (Neuron.s_momentum * deltaWeight); // alpha = momentum [0, n]
 
-            // Set new weight:
-            Double oldWeight = targetConnection.getWeight();
-            targetConnection.setWeight(oldWeight + newDeltaWeight);
+            // Update weight and update deltaWeight:
+            nextLayerConnection.updateWeight(newWeight);
         }
     }
 
-    public List<Connection> getSourceConnections()
+    public List<Connection> getNextLayerConnections()
     {
-        return m_sourceConnections;
+        return m_nextLayerConnections;
     }
 
-    public List<Connection> getTargetConnections()
+    public List<Connection> getPreviousLayerConnections()
     {
-        return m_targetConnections;
+        return m_previousLayerConnections;
     }
 
     private static Double sigmoidFunction(Double x)
