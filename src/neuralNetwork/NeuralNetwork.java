@@ -1,5 +1,7 @@
 package neuralNetwork;
 
+import data.DataSet;
+import data.Example;
 import neuralNetwork.utils.IWeightAssigner;
 import neuralNetwork.utils.RandomAssigner;
 import neuralNetwork.utils.TestAssigner;
@@ -44,6 +46,24 @@ public class NeuralNetwork
 
             previousLayer = layer;
         }
+    }
+
+    public void train(DataSet trainData, double desiredError, int maxIterations)
+    {
+        double error = 0.0;
+        int iteration = 0;
+
+        do
+        {
+            for (Example example : trainData.getExamples())
+            {
+                feedForward(example.getAttributes());
+                backPropagate(example.getTargetList());
+            }
+
+            iteration++;
+
+        } while(error > desiredError && iteration < maxIterations);
     }
 
     public void feedForward(List<Double> inputValues)

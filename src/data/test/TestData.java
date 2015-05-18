@@ -1,8 +1,7 @@
 package data.test;
 
-import data.DataType;
+import data.DataSet;
 import data.Example;
-import data.train.TrainingExample;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -13,10 +12,8 @@ import java.util.List;
 /**
  * Created by Miguel on 17-05-2015.
  */
-public class TestData
+public class TestData extends DataSet
 {
-    private List<Example> m_examples = new ArrayList<>();
-
     public TestData(String filePath)
     {
         try
@@ -30,7 +27,7 @@ public class TestData
             {
                 // Parse a training example and set a training type to it:
                 TestExample example = new TestExample(line);
-                example.setType(DataType.intToType(i));
+                example.setType(DataSet.DataType.intToType(i));
 
                 m_examples.add(example);
 

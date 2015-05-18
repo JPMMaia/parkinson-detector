@@ -1,22 +1,16 @@
 package data.train;
 
-import data.DataClass;
-import data.DataType;
-import data.Example;
+import data.DataSet;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Miguel on 16-05-2015.
  */
-public class TrainingData
+public class TrainingData extends DataSet
 {
-    private List<Example> m_examples = new ArrayList<>();
-
     public TrainingData(String filePath)
     {
         try
@@ -30,7 +24,7 @@ public class TrainingData
             {
                 // Parse a training example and set a training type to it:
                 TrainingExample example = new TrainingExample(line);
-                example.setType(DataType.intToType(i));
+                example.setType(DataSet.DataType.intToType(i));
 
                 m_examples.add(example);
 

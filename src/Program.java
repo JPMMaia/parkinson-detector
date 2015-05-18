@@ -1,5 +1,9 @@
+import data.DataSet;
 import data.test.TestData;
 import data.train.TrainingData;
+import neuralNetwork.NeuralNetwork;
+
+import java.util.Arrays;
 
 /**
  * Created by Miguel on 17-05-2015.
@@ -14,10 +18,18 @@ public class Program
 
     public void run()
     {
-        TrainingData train = new TrainingData("data/train_data.txt");
-        TestData test = new TestData("data/test_data.txt");
+        // Read data:
+        DataSet trainData = new TrainingData("data/train_data.txt");
+        DataSet testData = new TestData("data/test_data.txt");
 
-        System.out.println("lol");
+        // Normalize data:
+        trainData.normalize();
+        testData.normalize();
+
+        NeuralNetwork network = new NeuralNetwork();
+        network.initialize(Arrays.asList(trainData.getNumAttributes(), testData.getNumAttributes() + 2, 2), 0.3, 0.2);
+        network.train(trainData, 0.001, 100);
+        System.out.println("Ja deu");
     }
 
     public static void main(String[] args)

@@ -1,11 +1,7 @@
 package data.train;
 
-import data.DataClass;
-import data.DataType;
+import data.DataSet;
 import data.Example;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Miguel on 17-05-2015.
@@ -34,9 +30,9 @@ public class TrainingExample extends Example
                 int classValue = Integer.parseInt(fields[i]);
 
                 if (classValue == 1)
-                    m_class = DataClass.PARKINSON;
+                    m_class = DataSet.DataClass.PARKINSON;
                 else if (classValue == 0)
-                    m_class = DataClass.HEALTHY;
+                    m_class = DataSet.DataClass.HEALTHY;
                 else
                     throw new IllegalArgumentException("Invalid class value in train file: " + classValue);
 
