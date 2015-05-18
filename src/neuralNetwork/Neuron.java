@@ -5,20 +5,19 @@ import java.util.List;
 
 public class Neuron
 {
-    private static final Double s_learningRate = 0.4;
-    private static final Double s_momentum = 0.8;
+    protected Double m_learningRate;
+    protected Double m_momentum;
 
-    private Double m_outputValue;
-    private Double m_gradientValue;
-    private List<Connection> m_nextLayerConnections;
-    private List<Connection> m_previousLayerConnections;
+    protected Double m_outputValue;
+    protected Double m_gradientValue;
+    protected List<Connection> m_nextLayerConnections;
+    protected List<Connection> m_previousLayerConnections;
 
-    public Neuron()
+    public Neuron(Double learningRate, Double momentum)
     {
-    }
+        m_learningRate = learningRate;
+        m_momentum = momentum;
 
-    public void initialize()
-    {
         m_outputValue = 0.0;
         m_gradientValue = 0.0;
         m_nextLayerConnections = new ArrayList<>();
@@ -122,8 +121,8 @@ public class Neuron
 
             Double newWeight =
                     oldWeight
-                    + (Neuron.s_learningRate * m_outputValue * targetGradient) // Overall learning rate [0, 1]
-                    + (Neuron.s_momentum * deltaWeight); // alpha = momentum [0, n]
+                    + (m_learningRate * m_outputValue * targetGradient) // Overall learning rate [0, 1]
+                    + (m_momentum * deltaWeight); // alpha = momentum [0, n]
 
             // Update weight and update deltaWeight:
             nextLayerConnection.updateWeight(newWeight);

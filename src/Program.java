@@ -4,19 +4,18 @@ import data.train.TrainingData;
 /**
  * Created by Miguel on 17-05-2015.
  */
-public class ParkinsonDetector
+public class Program
 {
     private String m_filePath;
 
-    public ParkinsonDetector(String filePath)
+    public Program()
     {
-        m_filePath = filePath;
     }
 
     public void run()
     {
-        TrainingData lol = new TrainingData("data/train_data.txt");
-        TestData lol2 = new TestData("data/test_data.txt");
+        TrainingData train = new TrainingData("data/train_data.txt");
+        TestData test = new TestData("data/test_data.txt");
 
         System.out.println("lol");
     }
@@ -25,7 +24,7 @@ public class ParkinsonDetector
     {
         try
         {
-            ParkinsonDetector detector = new ParkinsonDetector("lol");
+            Program detector = new Program();
             detector.run();
         }
         catch(IllegalArgumentException e)

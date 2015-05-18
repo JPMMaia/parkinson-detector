@@ -1,7 +1,6 @@
 package neuralNetwork;
 
 import neuralNetwork.utils.IWeightAssigner;
-import neuralNetwork.utils.RandomAssigner;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,29 +9,30 @@ public class Layer
 {
     private List<Neuron> m_neurons;
 
-    public void initialize(Integer numberNeurons)
+    // Initialize for input layer:
+    public void initialize(Integer numberNeurons, Double learningRate, Double momentum)
     {
         m_neurons = new ArrayList<>(numberNeurons);
 
+        // Generate the number of neurons desired:
         for (int i = 0; i < numberNeurons; i++)
-        {
-            Neuron neuron = new Neuron();
-            neuron.initialize();
+            m_neurons.add(new Neuron(learningRate, momentum));
 
-            m_neurons.add(neuron);
-        }
+        // Add a bias neuron:
+        m_neurons.add(new BiasNeuron(learningRate, momentum));
     }
 
-    public void initialize(Integer numberNeurons, Layer previousLayer, IWeightAssigner initialWeightAssigner)
+    // Initialize for other layers:
+    public void initialize(Integer numberNeurons, Layer previousLayer, IWeightAssigner initialWeightAssigner, boolean isOutputLayer, Double learningRate, Double momentum)
     {
         m_neurons = new ArrayList<>(numberNeurons);
         List<Neuron> previousNeurons = previousLayer.getNeurons();
 
         for(int i = 0; i < numberNeurons; i++)
         {
-            Neuron currentNeuron = new Neuron();
-            currentNeuron.initialize();
+            Neuron currentNeuron = new Neuron(learningRate, momentum);
 
+            // Connect to previous neurons:
             for(Neuron previousNeuron : previousNeurons)
             {
                 Connection connection = new Connection();
@@ -44,6 +44,10 @@ public class Layer
 
             m_neurons.add(currentNeuron);
         }
+
+        // If this is not the input layer, add a bias neuron:
+        if (!isOutputLayer)
+            m_neurons.add(new BiasNeuron(learningRate, momentum));
     }
 
     public void calculateOutputValues()
@@ -53,7 +57,7 @@ public class Layer
 
     public boolean setOutputValues(List<Double> outputValues)
     {
-        if(outputValues.size() != m_neurons.size())
+        if(outputValues.size() != m_neurons.size() - 1)
             return false;
 
         for(int i = 0; i < outputValues.size(); i++)

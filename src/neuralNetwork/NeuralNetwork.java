@@ -17,14 +17,14 @@ public class NeuralNetwork
         m_initialWeightAssigner = new RandomAssigner(); // The default one!
     }
 
-    public void initialize(List<Integer> topology)
+    public void initialize(List<Integer> topology, Double learningRate, Double momentum)
     {
         // Create layers list:
         m_layers = new ArrayList<>(topology.size());
 
         // Create input layer:
         Layer inputLayer = new Layer();
-        inputLayer.initialize(topology.get(0));
+        inputLayer.initialize(topology.get(0), learningRate, momentum);
         m_layers.add(inputLayer);
 
         Layer previousLayer = inputLayer;
@@ -33,8 +33,11 @@ public class NeuralNetwork
             // Number of neurons of the layer:
             int numberNeurons = topology.get(i);
 
+            // Check if this is the output layer:
+            boolean isOutputLayer = (i == topology.size() - 1);
+
             Layer layer = new Layer();
-            layer.initialize(numberNeurons, previousLayer, m_initialWeightAssigner);
+            layer.initialize(numberNeurons, previousLayer, m_initialWeightAssigner, isOutputLayer, learningRate, momentum);
 
             // Add new layer to the list:
             m_layers.add(layer);
@@ -74,7 +77,7 @@ public class NeuralNetwork
             hiddenLayer.calculateGradientValues();
         }
 
-        // Update all connection weights:
+
         /*
         for (int i = m_layers.size() - 1; i > 0; i--)
         {
@@ -83,6 +86,7 @@ public class NeuralNetwork
         }
         */
 
+        // Update all connection weights:
         for (int i = m_layers.size() - 2; i >= 0; i--)
         {
             Layer currentLayer = m_layers.get(i);

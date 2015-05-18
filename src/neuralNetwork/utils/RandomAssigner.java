@@ -7,6 +7,6 @@ public class RandomAssigner implements IWeightAssigner
     // Get a random weight between 0 and 1
     public Double assignWeight()
     {
-        return s_RANDOM.nextDouble();
+        return s_RANDOM.nextDouble() - 0.5;
     }
 }
