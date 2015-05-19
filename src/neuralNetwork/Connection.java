@@ -6,8 +6,7 @@ public class Connection
     private Neuron m_target;
 
     private Double m_weight;
-    private Double m_weightN_1;
-    private Double m_weightN_2;
+    private Double m_lastWeight;
     private Double m_deltaWeight;
 
     public void initialize(Neuron source, Neuron target, Double weight)
@@ -15,7 +14,7 @@ public class Connection
         m_source = source;
         m_target = target;
         m_weight = weight;
-        m_weightN_1 = null;
+        m_lastWeight = null;
         m_deltaWeight = 0.0;
     }
 
@@ -42,11 +41,11 @@ public class Connection
     public void updateWeight(Double weight)
     {
         // The weight from past iteration becomes the weight from past-past iteration, etc...
-        m_weightN_1 = m_weight;
+        m_lastWeight = m_weight;
         m_weight = weight;
 
         // Only write a deltaWeight different from 0 if we have enough past iterations!
-        if (m_weightN_1 != null)
-            m_deltaWeight = m_weight - m_weightN_1;
+        if (m_lastWeight != null)
+            m_deltaWeight = m_weight - m_lastWeight;
     }
 }

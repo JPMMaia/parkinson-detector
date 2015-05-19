@@ -27,9 +27,9 @@ public class Program
         testData.normalize();
 
         NeuralNetwork network = new NeuralNetwork();
-        network.initialize(Arrays.asList(trainData.getNumAttributes(), testData.getNumAttributes() + 2, 2), 0.3, 0.2);
-        network.train(trainData, 0.001, 100);
-        System.out.println("Ja deu");
+        network.initialize(Arrays.asList(trainData.getNumAttributes(), testData.getNumAttributes() + 2, 2), 0.4, 0.0);
+        network.train(trainData, 0.001, 60);
+        System.out.println("Ja deu: " + (trainData.getNumAttributes() + 2));
     }
 
     public static void main(String[] args)

@@ -90,6 +90,25 @@ public class Layer
         return cost;
     }
 
+    public Double calculateMSE(List<Double> targetValues)
+    {
+        Double cost = 0.0;
+
+        for(int i = 0; i < targetValues.size(); i++)
+        {
+            Neuron neuron = m_neurons.get(i);
+            Double targetValue = targetValues.get(i);
+            Double outputValue = neuron.getOutputValue();
+
+            Double delta = targetValue - outputValue;
+            cost += delta * delta;
+        }
+
+        cost /= targetValues.size();
+
+        return cost;
+    }
+
     // If its a neuron on an Output Layer:
     public void calculateGradientValues(List<Double> targetValues)
     {

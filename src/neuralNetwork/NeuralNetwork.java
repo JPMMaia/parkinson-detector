@@ -55,18 +55,32 @@ public class NeuralNetwork
 
         do
         {
+            // Propagate:
+            int i=0;
             for (Example example : trainData.getExamples())
             {
-                feedForward(example.getAttributes());
+                System.out.println(i + " Class: " + example.getDataClass().name()); i++;
+                feedForward(example.getAttributes(), true);
                 backPropagate(example.getTargetList());
+            }
+
+            error = 0.0;
+
+            // Check current error:
+            for (Example example : trainData.getExamples())
+            {
+                feedForward(example.getAttributes(), false);
+                error += calculateMSE(example.getTargetList()) / trainData.getExamples().size(); // Get the mean of the MSE
             }
 
             iteration++;
 
+            System.out.println("Iter " + iteration + " c/ erro " + error);
+
         } while(error > desiredError && iteration < maxIterations);
     }
 
-    public void feedForward(List<Double> inputValues)
+    public void feedForward(List<Double> inputValues, boolean prints)
     {
         Layer inputLayer = getInputLayer();
         if(!inputLayer.setOutputValues(inputValues))
@@ -77,6 +91,9 @@ public class NeuralNetwork
             Layer layer = m_layers.get(i);
             layer.calculateOutputValues();
         }
+
+        if (prints)
+            System.out.println("Parkinson: " + getOutputLayer().getNeurons().get(0).getOutputValue() + " Healthy: " + getOutputLayer().getNeurons().get(1).getOutputValue());
     }
 
     public void backPropagate(List<Double> targetValues)
@@ -84,7 +101,8 @@ public class NeuralNetwork
         Layer outputLayer = getOutputLayer();
 
         // Calculate output layer cost:
-        // Double cost = outputLayer.calculateCost(targetValues);
+        //Double mse = outputLayer.calculateMSE(targetValues);
+        //System.out.println("Erro: " + mse);
 
         // Calculate output layer gradients:
         outputLayer.calculateGradientValues(targetValues);
@@ -97,15 +115,6 @@ public class NeuralNetwork
             hiddenLayer.calculateGradientValues();
         }
 
-
-        /*
-        for (int i = m_layers.size() - 1; i > 0; i--)
-        {
-            Layer currentLayer = m_layers.get(i);
-            currentLayer.updateConnectionsWeights();
-        }
-        */
-
         // Update all connection weights:
         for (int i = m_layers.size() - 2; i >= 0; i--)
         {
@@ -113,6 +122,11 @@ public class NeuralNetwork
             currentLayer.updateConnectionsWeights();
         }
 
+    }
+
+    public double calculateMSE(List<Double> targetValues)
+    {
+        return getOutputLayer().calculateMSE(targetValues);
     }
 
     public List<Layer> getLayers()
