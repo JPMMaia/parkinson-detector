@@ -1,10 +1,12 @@
 package data.train;
 
 import data.DataSet;
+import data.Example;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Created by Miguel on 16-05-2015.
@@ -12,6 +14,17 @@ import java.io.IOException;
 public class TrainingData extends DataSet
 {
     public TrainingData(String filePath)
+    {
+        super(filePath);
+    }
+
+    public TrainingData(List<Example> examples)
+    {
+        super(examples);
+    }
+
+    @Override
+    public void parseFromFile(String filePath)
     {
         try
         {

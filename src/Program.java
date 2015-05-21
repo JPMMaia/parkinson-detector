@@ -1,9 +1,11 @@
 import data.DataSet;
+import data.Example;
 import data.test.TestData;
 import data.train.TrainingData;
 import neuralNetwork.NeuralNetwork;
 
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by Miguel on 17-05-2015.
@@ -16,7 +18,7 @@ public class Program
     {
     }
 
-    public void run()
+    public void run() throws InstantiationException, IllegalAccessException
     {
         // Read data:
         DataSet trainData = new TrainingData("data/train_data.txt");
@@ -26,9 +28,15 @@ public class Program
         trainData.normalize();
         testData.normalize();
 
+        // Get what we want:
+        List<Example> newExamples = trainData.filterByType(DataSet.DataType.VowelA, DataSet.DataType.VowelO, DataSet.DataType.VowelU);
+        DataSet trainData2 = new TrainingData(newExamples);
+
+        trainData.toFile("data/new_train.txt");
+
         NeuralNetwork network = new NeuralNetwork();
-        network.initialize(Arrays.asList(trainData.getNumAttributes(), testData.getNumAttributes() + 2, 2), 0.4, 0.0);
-        network.train(trainData, 0.001, 60);
+        network.initialize(Arrays.asList(trainData.getNumAttributes(), trainData.getNumAttributes() + 20, 2), 0.4, 0.7);
+        network.train(trainData, 0.001, 4000);
         System.out.println("Ja deu: " + (trainData.getNumAttributes() + 2));
     }
 

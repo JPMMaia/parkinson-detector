@@ -50,7 +50,7 @@ public class NeuralNetwork
 
     public void train(DataSet trainData, double desiredError, int maxIterations)
     {
-        double error = 0.0;
+        double meanSquaredError;
         int iteration = 0;
 
         do
@@ -59,25 +59,39 @@ public class NeuralNetwork
             int i=0;
             for (Example example : trainData.getExamples())
             {
-                System.out.println(i + " Class: " + example.getDataClass().name()); i++;
-                feedForward(example.getAttributes(), true);
+                //System.out.println(i + " Class: " + example.getDataClass().name()); i++;
+                feedForward(example.getAttributes(), false);
                 backPropagate(example.getTargetList());
             }
 
-            error = 0.0;
+            meanSquaredError = 0.0;
 
             // Check current error:
             for (Example example : trainData.getExamples())
             {
                 feedForward(example.getAttributes(), false);
-                error += calculateMSE(example.getTargetList()) / trainData.getExamples().size(); // Get the mean of the MSE
+                meanSquaredError += calculateIterationError(example.getTargetList()); // Get the mean of the MSE
             }
+
+            meanSquaredError /= (2.0 * trainData.getExamples().size());
 
             iteration++;
 
-            System.out.println("Iter " + iteration + " c/ erro " + error);
+            System.out.println("Iter " + iteration + " c/ erro " + meanSquaredError);
 
-        } while(error > desiredError && iteration < maxIterations);
+        } while(meanSquaredError > desiredError && iteration < maxIterations);
+
+        // Check current error:
+        meanSquaredError = 0.0;
+        for (Example example : trainData.getExamples())
+        {
+            System.out.println("Class: " + example.getDataClass().name());
+            feedForward(example.getAttributes(), true);
+            meanSquaredError += calculateIterationError(example.getTargetList()); // Get the mean of the MSE
+        }
+        meanSquaredError /= (2.0 * trainData.getExamples().size());
+
+        System.out.println("MSE: " + meanSquaredError);
     }
 
     public void feedForward(List<Double> inputValues, boolean prints)
@@ -102,6 +116,7 @@ public class NeuralNetwork
 
         // Calculate output layer cost:
         //Double mse = outputLayer.calculateMSE(targetValues);
+        //System.out.println("Erro: " + outputLayer.calculateCost(targetValues));
         //System.out.println("Erro: " + mse);
 
         // Calculate output layer gradients:
@@ -124,9 +139,9 @@ public class NeuralNetwork
 
     }
 
-    public double calculateMSE(List<Double> targetValues)
+    public double calculateIterationError(List<Double> targetValues)
     {
-        return getOutputLayer().calculateMSE(targetValues);
+        return getOutputLayer().calculateError(targetValues);
     }
 
     public List<Layer> getLayers()

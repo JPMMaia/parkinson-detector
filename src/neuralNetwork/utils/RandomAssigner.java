@@ -8,5 +8,6 @@ public class RandomAssigner implements IWeightAssigner
     public Double assignWeight()
     {
         return s_RANDOM.nextDouble() - 0.5;
+        //return -1 + (1 - (-1)) * s_RANDOM.nextDouble();
     }
 }

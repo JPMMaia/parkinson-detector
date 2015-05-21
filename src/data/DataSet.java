@@ -1,5 +1,7 @@
 package data;
 
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,6 +11,18 @@ import java.util.List;
 public abstract class DataSet
 {
     protected List<Example> m_examples = new ArrayList<>();
+
+    public DataSet(String filePath)
+    {
+        parseFromFile(filePath);
+    }
+
+    public DataSet(List<Example> examples)
+    {
+        m_examples = examples;
+    }
+
+    public abstract void parseFromFile(String filePath);
 
     public void normalize()
     {
@@ -53,6 +67,24 @@ public abstract class DataSet
         }
     }
 
+    public List<Example> filterByType(DataType... types) throws IllegalAccessException, InstantiationException
+    {
+        List<Example> returnExamples = new ArrayList<>();
+
+        for (DataType type : types)
+        {
+            for (Example example : m_examples)
+            {
+                if (example.getDataType() == type)
+                    returnExamples.add(example);
+
+            }
+        }
+
+
+        return returnExamples;
+    }
+
     public List<Example> getExamples()
     {
         return m_examples;
@@ -62,6 +94,35 @@ public abstract class DataSet
     {
         return m_examples.get(0).getNumberAttributes();
     }
+
+    public void toFile(String path)
+    {
+        try
+        {
+            PrintWriter out = new PrintWriter(path);
+
+            for (int i = 0; i < m_examples.size(); i++)
+            {
+                String example = m_examples.get(i).toString();
+
+                out.print(example);
+
+                if (i != m_examples.size() - 1)
+                {
+                    out.print(",");
+                    out.println();
+                }
+            }
+
+            out.flush();
+        }
+        catch (FileNotFoundException e)
+        {
+            System.err.println("Error writing to file: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
 
 
     public enum DataClass

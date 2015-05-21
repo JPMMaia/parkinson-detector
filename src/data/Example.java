@@ -58,4 +58,21 @@ public abstract class Example
 
         return targetList;
     }
+
+    @Override
+    public String toString()
+    {
+        StringBuilder string = new StringBuilder();
+
+        for (Double attr: m_attributes)
+        {
+            string.append(attr);
+            string.append(",");
+        }
+
+        List<Double> targetList = getTargetList();
+        string.append(targetList.get(0)).append(",").append(targetList.get(1));
+
+        return string.toString();
+    }
 }

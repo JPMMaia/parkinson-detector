@@ -90,7 +90,7 @@ public class Layer
         return cost;
     }
 
-    public Double calculateMSE(List<Double> targetValues)
+    public Double calculateError(List<Double> targetValues)
     {
         Double cost = 0.0;
 
@@ -103,8 +103,6 @@ public class Layer
             Double delta = targetValue - outputValue;
             cost += delta * delta;
         }
-
-        cost /= targetValues.size();
 
         return cost;
     }

@@ -16,6 +16,12 @@ public class TestData extends DataSet
 {
     public TestData(String filePath)
     {
+        super(filePath);
+    }
+
+    @Override
+    public void parseFromFile(String filePath)
+    {
         try
         {
             BufferedReader br = new BufferedReader(new FileReader(filePath));
