@@ -32,11 +32,11 @@ public class Program
         List<Example> newExamples = trainData.filterByType(DataSet.DataType.VowelA, DataSet.DataType.VowelO, DataSet.DataType.VowelU);
         DataSet trainData2 = new TrainingData(newExamples);
 
-        trainData.toFile("data/new_train.txt");
+        // trainData.toFile("data/new_train.txt");
 
         NeuralNetwork network = new NeuralNetwork();
-        network.initialize(Arrays.asList(trainData.getNumAttributes(), trainData.getNumAttributes() + 20, 2), 0.4, 0.7);
-        network.train(trainData, 0.001, 4000);
+        network.initialize(Arrays.asList(trainData.getNumAttributes(), 21, 12, 2), 0.2, 0.4);
+        network.train(trainData, 0.001, 2000);
         System.out.println("Ja deu: " + (trainData.getNumAttributes() + 2));
     }
 
