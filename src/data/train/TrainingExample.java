@@ -17,7 +17,6 @@ public class TrainingExample extends Example
         if (fields.length != s_numberOfColumns)
             throw new IllegalArgumentException("Invalid number of columns in train file: " + fields.length);
 
-
        for (int i = 0; i < fields.length; i++)
         {
             // ignore index 27 because it is UPDRS

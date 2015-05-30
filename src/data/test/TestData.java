@@ -19,6 +19,11 @@ public class TestData extends DataSet
         super(filePath);
     }
 
+    public TestData(List<Example> examples)
+    {
+        super(examples);
+    }
+
     @Override
     public void parseFromFile(String filePath)
     {

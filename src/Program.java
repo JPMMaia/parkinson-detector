@@ -1,50 +1,88 @@
 import data.DataSet;
-import data.Example;
 import data.test.TestData;
 import data.train.TrainingData;
+import neuralNetwork.ClassificationReport;
 import neuralNetwork.NeuralNetwork;
 
 import java.util.Arrays;
-import java.util.List;
+import java.util.Locale;
+import java.util.Scanner;
 
 /**
  * Created by Miguel on 17-05-2015.
  */
 public class Program
 {
-    private String m_filePath;
+    private String ENUM_NORMAL_EXECUTION = "normal";
+    private String ENUM_VOGAL_EXECUTION = "vogal1";
+    private Scanner m_input = new Scanner(System.in).useLocale(Locale.US);
 
-    public Program()
+    private String m_trainPath, m_testPath;
+    private Double m_learningRate, m_momentum, m_maxError;
+    private Integer m_maxIterations;
+
+    public Program(String trainPath, String testPath)
     {
+        m_trainPath = trainPath;
+        m_testPath = testPath;
+    }
+
+    public void readParameters()
+    {
+        //System.out.println("Select execution mode: ");
+        //m_executionMode = m_input.nextLine();
+
+        System.out.print("Choose a learning rate [0,1]: ");
+        m_learningRate = m_input.nextDouble();
+        System.out.print("Choose a momentum [0,1]: ");
+        m_momentum = m_input.nextDouble();
+        System.out.print("Choose minimum error wanted: ");
+        m_maxError = m_input.nextDouble();
+        System.out.print("Choose the maximum number of iterations: ");
+        m_maxIterations = m_input.nextInt();
     }
 
     public void run() throws InstantiationException, IllegalAccessException
     {
         // Read data:
-        DataSet trainData = new TrainingData("data/train_data.txt");
-        DataSet testData = new TestData("data/test_data.txt");
+        DataSet trainData = new TrainingData(m_trainPath);
+        DataSet testData = new TestData(m_testPath);
 
         // Normalize data:
         trainData.normalize();
         testData.normalize();
 
-        // Get what we want:
-        List<Example> newExamples = trainData.filterByType(DataSet.DataType.VowelA, DataSet.DataType.VowelO, DataSet.DataType.VowelU);
-        DataSet trainData2 = new TrainingData(newExamples);
+        trainData.toFile("data/new_train.txt");
+        testData.toFile("data/new_test.txt");
 
-        // trainData.toFile("data/new_train.txt");
+        // Get what we want:
+        DataSet trainData2 = new TrainingData(trainData.filterByType(DataSet.DataType.Number4));
+        DataSet trainData3 = new TrainingData(trainData.groupAtributesBySubjectID(DataSet.DataType.VowelA, DataSet.DataType.VowelO));
+        DataSet trainData4 = new TrainingData(trainData.groupAtributesBySubjectID(DataSet.DataType.VowelA, DataSet.DataType.VowelO));
+        DataSet testData2 = new TestData(testData.filterByType(DataSet.DataType.VowelA));
+        DataSet testData4 = new TestData(testData.selectOneSamplePerDataType());
+        testData4 = new TestData(testData4.groupAtributesBySubjectID(DataSet.DataType.VowelA, DataSet.DataType.VowelO));
 
         NeuralNetwork network = new NeuralNetwork();
-        network.initialize(Arrays.asList(trainData.getNumAttributes(), 21, 12, 2), 0.2, 0.4);
-        network.train(trainData, 0.001, 2000);
-        System.out.println("Ja deu: " + (trainData.getNumAttributes() + 2));
+        network.initialize(Arrays.asList(trainData4.getNumAttributes(), 55, 2), m_learningRate, m_momentum);
+
+        network.train(trainData4, m_maxError, m_maxIterations);
+        ClassificationReport testReport = network.test(testData4);
+
+        System.out.println(testReport);
     }
 
     public static void main(String[] args)
     {
+        System.out.println("Welcome to Maiguel - Parkinson detector v1.0!");
+
+        if (args.length != 2)
+            System.out.println("Usage: <train_data_path> <test_data_path>");
+
         try
         {
-            Program detector = new Program();
+            Program detector = new Program(args[0], args[1]);
+            detector.readParameters();
             detector.run();
         }
         catch(IllegalArgumentException e)

@@ -6,16 +6,33 @@ import java.util.List;
 /**
  * Created by Miguel on 17-05-2015.
  */
-public abstract class Example
+public class Example
 {
     protected int m_subjectID;
     protected List<Double> m_attributes = new ArrayList<>();
     protected DataSet.DataClass m_class;
     protected DataSet.DataType m_dataType;
 
+    public Example()
+    {
+    }
+
+    public Example(int subjectID, List<Double> attributes, DataSet.DataClass dataClass)
+    {
+        m_subjectID = subjectID;
+        m_attributes.addAll(attributes);
+        m_class = dataClass;
+        m_dataType = null;
+    }
+
     public void setType(DataSet.DataType type)
     {
         m_dataType = type;
+    }
+
+    public int getSubjectID()
+    {
+        return m_subjectID;
     }
 
     public List<Double> getAttributes()

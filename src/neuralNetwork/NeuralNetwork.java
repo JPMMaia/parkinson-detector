@@ -4,10 +4,8 @@ import data.DataSet;
 import data.Example;
 import neuralNetwork.utils.IWeightAssigner;
 import neuralNetwork.utils.RandomAssigner;
-import neuralNetwork.utils.TestAssigner;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class NeuralNetwork
 {
@@ -50,48 +48,73 @@ public class NeuralNetwork
 
     public void train(DataSet trainData, double desiredError, int maxIterations)
     {
-        double meanSquaredError;
+        ClassificationReport reportTrain;
+        List<Example> m_shuffledExamples = new ArrayList<>(trainData.getExamples());
         int iteration = 0;
 
         do
         {
+            // Randomize examples:
+            Collections.shuffle(m_shuffledExamples);
             // Propagate:
-            int i=0;
-            for (Example example : trainData.getExamples())
+            for (Example example : m_shuffledExamples)
             {
-                //System.out.println(i + " Class: " + example.getDataClass().name()); i++;
                 feedForward(example.getAttributes(), false);
                 backPropagate(example.getTargetList());
             }
 
-            meanSquaredError = 0.0;
-
-            // Check current error:
-            for (Example example : trainData.getExamples())
-            {
-                feedForward(example.getAttributes(), false);
-                meanSquaredError += calculateIterationError(example.getTargetList()); // Get the mean of the MSE
-            }
-
-            meanSquaredError /= (2.0 * trainData.getExamples().size());
-
             iteration++;
 
-            System.out.println("Iter " + iteration + " c/ erro " + meanSquaredError);
+            reportTrain = getClassificationReport(trainData);
 
-        } while(meanSquaredError > desiredError && iteration < maxIterations);
+            System.out.println("Iter " + iteration + " c/ erro " + reportTrain.getMSE());
+
+        } while(reportTrain.getMSE() > desiredError && iteration < maxIterations);
 
         // Check current error:
-        meanSquaredError = 0.0;
-        for (Example example : trainData.getExamples())
-        {
-            System.out.println("Class: " + example.getDataClass().name());
-            feedForward(example.getAttributes(), true);
-            meanSquaredError += calculateIterationError(example.getTargetList()); // Get the mean of the MSE
-        }
-        meanSquaredError /= (2.0 * trainData.getExamples().size());
+        double finalError = reportTrain.getMSE();
+        System.out.println("MSE: " + finalError);
+    }
 
-        System.out.println("MSE: " + meanSquaredError);
+    public ClassificationReport test(DataSet data)
+    {
+        return getClassificationReport(data);
+    }
+
+    public ClassificationReport getClassificationReport(DataSet data)
+    {
+        ClassificationReport report = new ClassificationReport();
+
+        // Check current error:
+        Double meanSquaredError = 0.0;
+        for (Example example : data.getExamples())
+        {
+            feedForward(example.getAttributes(), false);
+            meanSquaredError += calculateIterationError(example.getTargetList()); // Get the mean of the MSE
+
+            double parkinsonOutput = getOutputLayer().getNeurons().get(0).getOutputValue();
+            double healthyOutput = getOutputLayer().getNeurons().get(1).getOutputValue();
+
+            if (example.getDataClass() == DataSet.DataClass.PARKINSON)
+            {
+                report.incTotalPositives();
+
+                if (parkinsonOutput >= healthyOutput)
+                    report.incTruePositives();
+            }
+            else
+            {
+                report.incTotalNegatives();
+
+                if (parkinsonOutput < healthyOutput)
+                    report.incTrueNegatives();
+            }
+        }
+
+        meanSquaredError /= (data.getExamples().size());
+        report.setMSE(meanSquaredError);
+
+        return report;
     }
 
     public void feedForward(List<Double> inputValues, boolean prints)
@@ -107,7 +130,7 @@ public class NeuralNetwork
         }
 
         if (prints)
-            System.out.println("Parkinson: " + getOutputLayer().getNeurons().get(0).getOutputValue() + " Healthy: " + getOutputLayer().getNeurons().get(1).getOutputValue());
+            System.out.println("P: " + getOutputLayer().getNeurons().get(0).getOutputValue() + " H: " + getOutputLayer().getNeurons().get(1).getOutputValue());
     }
 
     public void backPropagate(List<Double> targetValues)
@@ -115,7 +138,7 @@ public class NeuralNetwork
         Layer outputLayer = getOutputLayer();
 
         // Calculate output layer cost:
-        //Double mse = outputLayer.calculateMSE(targetValues);
+        //Double mse = outputLayer.getClassificationReport(targetValues);
         //System.out.println("Erro: " + outputLayer.calculateCost(targetValues));
         //System.out.println("Erro: " + mse);
 

@@ -2,8 +2,8 @@ package data;
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by Miguel on 18-05-2015.
@@ -72,15 +72,55 @@ public abstract class DataSet
         List<Example> returnExamples = new ArrayList<>();
 
         for (DataType type : types)
-        {
-            for (Example example : m_examples)
-            {
-                if (example.getDataType() == type)
-                    returnExamples.add(example);
+            returnExamples.addAll(m_examples.stream().filter(example -> example.getDataType() == type).collect(Collectors.toList()));
+        return returnExamples;
+    }
 
-            }
+    public List<Example> groupAtributesBySubjectID(DataType... types)
+    {
+        List<Example> returnExamples = new ArrayList<>();
+        HashMap<Integer, DataClass> subjectIDs = new HashMap<>();
+
+        // Get subject IDs from the examples:
+        for (Example example : m_examples)
+            subjectIDs.put(example.getSubjectID(), example.getDataClass());
+
+        for(Integer subjectID: subjectIDs.keySet())
+        {
+            List<Double> newAtributes = new ArrayList<>();
+
+            for(DataType type: types)
+                m_examples.stream().filter(example -> example.getSubjectID() == subjectID && example.getDataType() == type).forEach(example -> newAtributes.addAll(example.getAttributes()));
+
+            returnExamples.add(new Example(subjectID, newAtributes, subjectIDs.get(subjectID)));
         }
 
+        return returnExamples;
+    }
+
+    public List<Example> selectOneSamplePerDataType()
+    {
+        List<Example> returnExamples = new ArrayList<>();
+        HashMap<Integer, DataClass> subjectIDs = new HashMap<>();
+
+        // Get subject IDs from the examples:
+        for (Example example : m_examples)
+            subjectIDs.put(example.getSubjectID(), example.getDataClass());
+
+        for(Integer subjectID: subjectIDs.keySet())
+        {
+            for (DataType type : DataType.values())
+            {
+                List<Example> sameTypeExamples = m_examples.stream().filter(example -> example.getSubjectID() == subjectID && example.getDataType() == type).collect(Collectors.toList());
+
+                if (sameTypeExamples.isEmpty())
+                    break;
+
+                // Generate random integer:
+                int randomIndex = new Random().nextInt(sameTypeExamples.size());
+                returnExamples.add(sameTypeExamples.get(randomIndex));
+            }
+        }
 
         return returnExamples;
     }
@@ -122,8 +162,6 @@ public abstract class DataSet
             e.printStackTrace();
         }
     }
-
-
 
     public enum DataClass
     {

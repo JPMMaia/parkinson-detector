@@ -30,6 +30,8 @@ public class Neuron
             m_nextLayerConnections.add(connection);
         else if(connection.getTarget() == this)
             m_previousLayerConnections.add(connection);
+        else
+            throw new IllegalArgumentException("Invalid connectiona added");
     }
 
     public void calculateOutputValue()
