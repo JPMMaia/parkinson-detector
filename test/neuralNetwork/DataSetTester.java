@@ -2,11 +2,11 @@ package neuralNetwork;
 
 import data.DataSet;
 import data.Example;
-import data.test.TestData;
-import data.train.TrainingData;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -15,9 +15,9 @@ import java.util.List;
 public class DataSetTester
 {
     @Test
-    public void testRangeNormalization()
+    public void testRangeNormalization() throws IOException
     {
-        DataSet trainData = new TrainingData("data/train_data.txt");
+        DataSet trainData = DataSet.parseTrainFile("test_data/train_data.txt");
         trainData.normalize();
 
         for (Example example : trainData.getExamples())
@@ -26,9 +26,9 @@ public class DataSetTester
     }
 
     @Test
-    public void testTargetOutput()
+    public void testTargetOutput() throws IOException
     {
-        DataSet trainData = new TrainingData("data/train_data.txt");
+        DataSet trainData = DataSet.parseTrainFile("test_data/train_data.txt");
 
         List<Double> list1 =  trainData.getExamples().get(0).getTargetList();
         List<Double> list2 =  trainData.getExamples().get(520).getTargetList();
@@ -40,22 +40,22 @@ public class DataSetTester
     }
 
     @Test
-    public void selectOnePerType()
+    public void selectOnePerType() throws IOException
     {
-        DataSet testData = new TestData("data/test_data.txt");
+        DataSet testData = DataSet.parseTestFile("test_data/test_data.txt");
 
-        testData = new TestData(testData.selectOneSamplePerDataType());
+        testData = new DataSet(testData.selectOneSamplePerDataType());
 
         Assert.assertEquals(56, testData.getExamples().size());
     }
 
     @Test
-    public void joinByType()
+    public void joinByType() throws IOException
     {
-        DataSet testData = new TestData("data/test_data.txt");
+        DataSet testData = DataSet.parseTestFile("test_data/test_data.txt");
 
-        DataSet testDataTemp = new TestData(testData.selectOneSamplePerDataType());
-        testData = new TestData(testDataTemp.groupAtributesBySubjectID(DataSet.DataType.VowelA, DataSet.DataType.VowelO));
+        DataSet testDataTemp = new DataSet(testData.selectOneSamplePerDataType());
+        testData = new DataSet(testDataTemp.groupAtributesBySubjectID(Arrays.asList(DataSet.DataType.VowelA, DataSet.DataType.VowelO)));
 
         Assert.assertEquals(28, testData.getExamples().size());
         Assert.assertEquals(52, testData.getNumAttributes());

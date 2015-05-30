@@ -59,7 +59,7 @@ public class NeuralNetwork
             // Propagate:
             for (Example example : m_shuffledExamples)
             {
-                feedForward(example.getAttributes(), false);
+                feedForward(example.getAttributes());
                 backPropagate(example.getTargetList());
             }
 
@@ -89,7 +89,7 @@ public class NeuralNetwork
         Double meanSquaredError = 0.0;
         for (Example example : data.getExamples())
         {
-            feedForward(example.getAttributes(), false);
+            feedForward(example.getAttributes());
             meanSquaredError += calculateIterationError(example.getTargetList()); // Get the mean of the MSE
 
             double parkinsonOutput = getOutputLayer().getNeurons().get(0).getOutputValue();
@@ -117,7 +117,7 @@ public class NeuralNetwork
         return report;
     }
 
-    public void feedForward(List<Double> inputValues, boolean prints)
+    public void feedForward(List<Double> inputValues)
     {
         Layer inputLayer = getInputLayer();
         if(!inputLayer.setOutputValues(inputValues))
@@ -128,9 +128,6 @@ public class NeuralNetwork
             Layer layer = m_layers.get(i);
             layer.calculateOutputValues();
         }
-
-        if (prints)
-            System.out.println("P: " + getOutputLayer().getNeurons().get(0).getOutputValue() + " H: " + getOutputLayer().getNeurons().get(1).getOutputValue());
     }
 
     public void backPropagate(List<Double> targetValues)

@@ -36,7 +36,7 @@ public class TrainTester
         List<Connection> connectionsNode8 = hiddenNeurons2.get(2).getNextLayerConnections();
 
         // Test feed-forward:
-        net.feedForward(Arrays.asList(4.0, 5.0), false);
+        net.feedForward(Arrays.asList(4.0, 5.0));
         Assert.assertEquals(0.7766082273115665, outputNeurons.get(0).getOutputValue(), 0.000000000001);
         Assert.assertEquals(0.7094846597718821, outputNeurons.get(1).getOutputValue(), 0.000000000001);
 
@@ -81,7 +81,7 @@ public class TrainTester
         List<Connection> connectionsNode3 = intputNeurons.get(2).getNextLayerConnections();
 
         // First iteration:
-        net.feedForward(Arrays.asList(1.2, 0.7), false);
+        net.feedForward(Arrays.asList(1.2, 0.7));
         Assert.assertEquals(0.7807427479121283, outputNeuron.getOutputValue(), 0.000000000001);
         net.backPropagate(Arrays.asList(0.2));
         Assert.assertEquals(0.7522814807834137, connectionsNode1.get(0).getWeight(), 0.000000000001);
@@ -89,7 +89,7 @@ public class TrainTester
         Assert.assertEquals(0.06023456731951144, connectionsNode3.get(0).getWeight(), 0.000000000001);
 
         // Second iteration:
-        net.feedForward(Arrays.asList(1.2, 0.7), false);
+        net.feedForward(Arrays.asList(1.2, 0.7));
         Assert.assertEquals(0.760147306723454, outputNeuron.getOutputValue(), 0.000000000001);
         net.backPropagate(Arrays.asList(0.2));
         Assert.assertEquals(0.6650852496069066, connectionsNode1.get(0).getWeight(), 0.000000000001);
@@ -97,7 +97,7 @@ public class TrainTester
         Assert.assertEquals(-0.01242895866091114, connectionsNode3.get(0).getWeight(), 0.000000000001);
 
         // Third iteration:
-        net.feedForward(Arrays.asList(1.2, 0.7), false);
+        net.feedForward(Arrays.asList(1.2, 0.7));
         Assert.assertEquals(0.7192174361742039, outputNeuron.getOutputValue(), 0.000000000001);
         net.backPropagate(Arrays.asList(0.2));
         Assert.assertEquals(0.5449989694791029, connectionsNode1.get(0).getWeight(), 0.000000000001);

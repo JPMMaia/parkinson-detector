@@ -1,9 +1,8 @@
 import data.DataSet;
-import data.test.TestData;
-import data.train.TrainingData;
 import neuralNetwork.ClassificationReport;
 import neuralNetwork.NeuralNetwork;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.Scanner;
@@ -42,32 +41,32 @@ public class Program
         m_maxIterations = m_input.nextInt();
     }
 
-    public void run() throws InstantiationException, IllegalAccessException
+    public void run() throws InstantiationException, IllegalAccessException, IOException
     {
         // Read data:
-        DataSet trainData = new TrainingData(m_trainPath);
-        DataSet testData = new TestData(m_testPath);
+        DataSet trainData = DataSet.parseTrainFile(m_trainPath);
+        DataSet testData = DataSet.parseTestFile(m_testPath);
 
         // Normalize data:
         trainData.normalize();
         testData.normalize();
 
-        trainData.toFile("data/new_train.txt");
-        testData.toFile("data/new_test.txt");
+        //trainData.toFile("data/new_train.txt");
+        //testData.toFile("data/new_test.txt");
 
         // Get what we want:
-        DataSet trainData2 = new TrainingData(trainData.filterByType(DataSet.DataType.Number4));
-        DataSet trainData3 = new TrainingData(trainData.groupAtributesBySubjectID(DataSet.DataType.VowelA, DataSet.DataType.VowelO));
-        DataSet trainData4 = new TrainingData(trainData.groupAtributesBySubjectID(DataSet.DataType.VowelA, DataSet.DataType.VowelO));
-        DataSet testData2 = new TestData(testData.filterByType(DataSet.DataType.VowelA));
-        DataSet testData4 = new TestData(testData.selectOneSamplePerDataType());
-        testData4 = new TestData(testData4.groupAtributesBySubjectID(DataSet.DataType.VowelA, DataSet.DataType.VowelO));
+        DataSet trainData2 = new DataSet(trainData.filterByType(Arrays.asList(DataSet.DataType.Number4)));
+        DataSet trainData3 = new DataSet(trainData.groupAtributesBySubjectID(Arrays.asList(DataSet.DataType.VowelA, DataSet.DataType.VowelO)));
+        DataSet trainData4 = new DataSet(trainData.groupAtributesBySubjectID(Arrays.asList(DataSet.DataType.VowelA, DataSet.DataType.VowelO)));
+        DataSet testData2 = new DataSet(testData.filterByType(Arrays.asList(DataSet.DataType.VowelA)));
+        DataSet testData4 = new DataSet(testData.selectOneSamplePerDataType());
+        testData4 = new DataSet(testData4.groupAtributesBySubjectID(Arrays.asList(DataSet.DataType.VowelA, DataSet.DataType.VowelO)));
 
         NeuralNetwork network = new NeuralNetwork();
-        network.initialize(Arrays.asList(trainData4.getNumAttributes(), 55, 2), m_learningRate, m_momentum);
+        network.initialize(Arrays.asList(trainData2.getNumAttributes(), 29, 29, 2), m_learningRate, m_momentum);
 
-        network.train(trainData4, m_maxError, m_maxIterations);
-        ClassificationReport testReport = network.test(testData4);
+        network.train(trainData2, m_maxError, m_maxIterations);
+        ClassificationReport testReport = network.test(testData);
 
         System.out.println(testReport);
     }

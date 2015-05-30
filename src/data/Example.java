@@ -25,6 +25,74 @@ public class Example
         m_dataType = null;
     }
 
+    public static Example parseTrainExample(String line)
+    {
+        Example example = new Example();
+        int numberOfColumns = 29;
+
+        String[] fields = line.split(",");
+
+        if (fields.length != numberOfColumns)
+            throw new IllegalArgumentException("Invalid number of columns in train file: " + fields.length);
+
+        for (int i = 0; i < fields.length; i++)
+        {
+            // ignore index 27 because it is UPDRS
+            if (i == 0)
+                example.m_subjectID = Integer.parseInt(fields[i]);
+            else if (i >= 1 && i <= 26)
+                example.m_attributes.add(Double.parseDouble(fields[i]));
+            else if (i == 28)
+            {
+                int classValue = Integer.parseInt(fields[i]);
+
+                if (classValue == 1)
+                    example.m_class = DataSet.DataClass.PARKINSON;
+                else if (classValue == 0)
+                    example.m_class = DataSet.DataClass.HEALTHY;
+                else
+                    throw new IllegalArgumentException("Invalid class value in train file: " + classValue);
+
+            }
+        }
+
+        return example;
+    }
+
+    public static Example parseTestExample(String line)
+    {
+        Example example = new Example();
+        final int numberOfColumns = 28;
+
+        String[] fields = line.split(",");
+
+        if (fields.length != numberOfColumns)
+            throw new IllegalArgumentException("Invalid number of columns in test file: " + fields.length);
+
+
+        for (int i = 0; i < fields.length; i++)
+        {
+            if (i == 0)
+                example.m_subjectID = Integer.parseInt(fields[i]);
+            else if (i >= 1 && i <= 26)
+                example.m_attributes.add(Double.parseDouble(fields[i]));
+            else if (i == 27)
+            {
+                int classValue = Integer.parseInt(fields[i]);
+
+                if (classValue == 1)
+                    example.m_class = DataSet.DataClass.PARKINSON;
+                else if (classValue == 0)
+                    example.m_class = DataSet.DataClass.HEALTHY;
+                else
+                    throw new IllegalArgumentException("Invalid class value in test file: " + classValue);
+
+            }
+        }
+
+        return example;
+    }
+
     public void setType(DataSet.DataType type)
     {
         m_dataType = type;

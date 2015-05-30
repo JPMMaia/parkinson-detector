@@ -1,28 +1,78 @@
 package data;
 
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
-import java.util.*;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 /**
  * Created by Miguel on 18-05-2015.
  */
-public abstract class DataSet
+public class DataSet
 {
     protected List<Example> m_examples = new ArrayList<>();
 
-    public DataSet(String filePath)
-    {
-        parseFromFile(filePath);
-    }
+    public DataSet()
+    {}
 
     public DataSet(List<Example> examples)
     {
         m_examples = examples;
     }
 
-    public abstract void parseFromFile(String filePath);
+    public static DataSet parseTrainFile(String filePath) throws IOException
+    {
+        DataSet trainData = new DataSet();
+        BufferedReader br = new BufferedReader(new FileReader(filePath));
+
+        String line;
+        int i = 0; // counter for enum
+
+        while ((line = br.readLine()) != null)
+        {
+            // Parse a training example and set a training type to it:
+            Example example = Example.parseTrainExample(line);
+            example.setType(DataSet.DataType.intToType(i));
+
+            trainData.m_examples.add(example);
+
+            i++;
+            i = i % 26;
+        }
+
+        return trainData;
+    }
+
+    public static DataSet parseTestFile(String filePath) throws IOException
+    {
+        DataSet testData = new DataSet();
+        BufferedReader br = new BufferedReader(new FileReader(filePath));
+
+        String line;
+        int i = 0, j = 0; // counter for enum (i => VogalA or VogalO, j => how many examples of that vogal we have!)
+
+        while ((line = br.readLine()) != null)
+        {
+            // Parse a training example and set a training type to it:
+            Example example = Example.parseTestExample(line);
+            example.setType(DataSet.DataType.intToType(i));
+
+            testData.m_examples.add(example);
+
+            j++;
+
+            if (j == 3)
+            {
+                j = 0;
+                i++;
+                i = i % 2;
+            }
+        }
+
+        return testData;
+    }
 
     public void normalize()
     {
@@ -67,7 +117,7 @@ public abstract class DataSet
         }
     }
 
-    public List<Example> filterByType(DataType... types) throws IllegalAccessException, InstantiationException
+    public List<Example> filterByType(List<DataType> types) throws IllegalAccessException, InstantiationException
     {
         List<Example> returnExamples = new ArrayList<>();
 
@@ -76,7 +126,7 @@ public abstract class DataSet
         return returnExamples;
     }
 
-    public List<Example> groupAtributesBySubjectID(DataType... types)
+    public List<Example> groupAtributesBySubjectID(List<DataType> types)
     {
         List<Example> returnExamples = new ArrayList<>();
         HashMap<Integer, DataClass> subjectIDs = new HashMap<>();
