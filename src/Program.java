@@ -63,14 +63,107 @@ public class Program
         testData4 = new DataSet(testData4.groupAtributesBySubjectID(Arrays.asList(DataSet.DataType.VowelA, DataSet.DataType.VowelO)));
         */
 
-        //trainData = new DataSet(trainData.filterByType(Arrays.asList(DataSet.DataType.VowelA, DataSet.DataType.VowelO)));
-        //testData = new DataSet(testData.filterByType(Arrays.asList(DataSet.DataType.VowelA, DataSet.DataType.VowelO)));
+        trainData = new DataSet(trainData.filterByType(Arrays.asList(DataSet.DataType.VowelO)));
+        testData = new DataSet(testData.filterByType(Arrays.asList(DataSet.DataType.VowelO)));
+
+        System.out.println("Initiating 2");
 
         NeuralNetwork network = new NeuralNetwork();
+        network.initialize(Arrays.asList(trainData.getNumAttributes(), 2, 2), m_learningRate, m_momentum);
+        network.train(trainData, m_maxError, m_maxIterations);
+        System.out.println(network.test(testData));
+
+        System.out.println("Initiating 5");
+
+        network = new NeuralNetwork();
+        network.initialize(Arrays.asList(trainData.getNumAttributes(), 5, 2), m_learningRate, m_momentum);
+        network.train(trainData, m_maxError, m_maxIterations);
+        System.out.println(network.test(testData));
+
+        System.out.println("Initiating 10");
+
+        network = new NeuralNetwork();
+        network.initialize(Arrays.asList(trainData.getNumAttributes(), 10, 2), m_learningRate, m_momentum);
+        network.train(trainData, m_maxError, m_maxIterations);
+        System.out.println(network.test(testData));
+
+        System.out.println("Initiating 15");
+
+        network = new NeuralNetwork();
+        network.initialize(Arrays.asList(trainData.getNumAttributes(), 15, 2), m_learningRate, m_momentum);
+        network.train(trainData, m_maxError, m_maxIterations);
+        System.out.println(network.test(testData));
+
+        System.out.println("Initiating 20");
+
+        network = new NeuralNetwork();
+        network.initialize(Arrays.asList(trainData.getNumAttributes(), 20, 2), m_learningRate, m_momentum);
+        network.train(trainData, m_maxError, m_maxIterations);
+        System.out.println(network.test(testData));
+
+        System.out.println("Initiating 25");
+
+        network = new NeuralNetwork();
+        network.initialize(Arrays.asList(trainData.getNumAttributes(), 25, 2), m_learningRate, m_momentum);
+        network.train(trainData, m_maxError, m_maxIterations);
+        System.out.println(network.test(testData));
+
+        System.out.println("Initiating 29");
+
+        network = new NeuralNetwork();
+        network.initialize(Arrays.asList(trainData.getNumAttributes(), 29, 2), m_learningRate, m_momentum);
+        network.train(trainData, m_maxError, m_maxIterations);
+        System.out.println(network.test(testData));
+
+        System.out.println("Initiating 2:2");
+
+        network = new NeuralNetwork();
+        network.initialize(Arrays.asList(trainData.getNumAttributes(), 2, 2, 2), m_learningRate, m_momentum);
+        network.train(trainData, m_maxError, m_maxIterations);
+        System.out.println(network.test(testData));
+
+        System.out.println("Initiating 5:5");
+
+        network = new NeuralNetwork();
+        network.initialize(Arrays.asList(trainData.getNumAttributes(), 5, 5, 2), m_learningRate, m_momentum);
+        network.train(trainData, m_maxError, m_maxIterations);
+        System.out.println(network.test(testData));
+
+        System.out.println("Initiating 10:10");
+
+        network = new NeuralNetwork();
         network.initialize(Arrays.asList(trainData.getNumAttributes(), 10, 10, 2), m_learningRate, m_momentum);
         network.train(trainData, m_maxError, m_maxIterations);
-        ClassificationReport testReport = network.test(testData);
-        System.out.println(testReport);
+        System.out.println(network.test(testData));
+
+        System.out.println("Initiating 15:15");
+
+        network = new NeuralNetwork();
+        network.initialize(Arrays.asList(trainData.getNumAttributes(), 15, 15, 2), m_learningRate, m_momentum);
+        network.train(trainData, m_maxError, m_maxIterations);
+        System.out.println(network.test(testData));
+
+        System.out.println("Initiating 20:20");
+
+        network = new NeuralNetwork();
+        network.initialize(Arrays.asList(trainData.getNumAttributes(), 20, 20, 2), m_learningRate, m_momentum);
+        network.train(trainData, m_maxError, m_maxIterations);
+        System.out.println(network.test(testData));
+
+        System.out.println("Initiating 25:25");
+
+        network = new NeuralNetwork();
+        network.initialize(Arrays.asList(trainData.getNumAttributes(), 25, 25, 2), m_learningRate, m_momentum);
+        network.train(trainData, m_maxError, m_maxIterations);
+        System.out.println(network.test(testData));
+
+        System.out.println("Initiating 29:29");
+
+        network = new NeuralNetwork();
+        network.initialize(Arrays.asList(trainData.getNumAttributes(), 29, 29, 2), m_learningRate, m_momentum);
+        network.train(trainData, m_maxError, m_maxIterations);
+        System.out.println(network.test(testData));
+
         /*
         network.initialize(Arrays.asList(trainData5.getNumAttributes(), 2), m_learningRate, m_momentum);
 
