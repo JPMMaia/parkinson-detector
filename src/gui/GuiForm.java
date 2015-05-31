@@ -8,8 +8,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
+import java.util.List;
 
 /**
  * Created by Miguel on 29-05-2015.
@@ -18,7 +18,7 @@ public class GuiForm extends JFrame
 {
     private JPanel Container;
     private JPanel rootPanel;
-    private JTextField textField1;
+    private JTextField hiddenLayerTopology;
     private JPanel Network;
     private JButton trainAndTestButton;
     private JSpinner learningSPinner;
@@ -49,15 +49,15 @@ public class GuiForm extends JFrame
     private JCheckBox word8CheckBox;
     private JCheckBox word7CheckBox;
     private JCheckBox word9CheckBox;
-    private JRadioButton allAtributesRadioButton;
-    private JRadioButton allAtributesAORadioButton;
-    private JCheckBox checkBox1;
-    private JCheckBox checkBox2;
     private JPanel TrainingExamples;
     private JPanel Sidebar;
     private JTextField testFile;
     private JTextField trainFile;
     private JTextArea console;
+    private JSpinner errorSpinner;
+    private JSpinner iterationsSpinner;
+    private JCheckBox vowelATestCheckBox;
+    private JCheckBox vowelOTestCheckBox;
 
 
     public GuiForm()
@@ -74,9 +74,6 @@ public class GuiForm extends JFrame
         trainAndTestButton.addActionListener(e ->
         {
             console.setText("");
-
-
-
             executeNetwork();
         });
     }
@@ -97,6 +94,14 @@ public class GuiForm extends JFrame
 
         momentumSpinner = new JSpinner();
         momentumSpinner.setModel(new SpinnerNumberModel(0.7, 0.0, 1.0, 0.05));
+
+        errorSpinner = new JSpinner();
+        errorSpinner.setModel(new SpinnerNumberModel(0.0001, 0.0, 100.0, 0.00000005));
+        JSpinner.NumberEditor numberEditor = new JSpinner.NumberEditor(errorSpinner,"0.000000000");
+        errorSpinner.setEditor(numberEditor);
+
+        iterationsSpinner = new JSpinner();
+        iterationsSpinner.setModel(new SpinnerNumberModel(4000, 1, 100000, 1));
     }
 
     public void executeNetwork()
@@ -113,12 +118,25 @@ public class GuiForm extends JFrame
             trainData.normalize();
             testData.normalize();
 
+            // Treat data:
             trainData = new DataSet(trainData.filterByType(getDataTypesToTrain()));
+            testData = new DataSet(testData.filterByType(getDataTypesToTest()));
+
+            // Get network topology:
+            java.util.List<Integer> topology = getHiddenLayerTopology();
+            topology.add(0, trainData.getNumAttributes()); // input
+            topology.add(2); // output
+
+            System.out.println("** Information: **");
+            System.out.println("Topology selected: " + Arrays.toString(topology.toArray()));
+            System.out.println("Learning rate: " + learningSPinner.getValue() + " Momentum: " + momentumSpinner.getValue());
+            System.out.println("Max Error: " + errorSpinner.getValue() + " Max iteration number: " + iterationsSpinner.getValue());
+            System.out.println();
 
             NeuralNetwork network = new NeuralNetwork();
-            network.initialize(Arrays.asList(trainData.getNumAttributes(), 29, 29, 2), (Double) learningSPinner.getValue(), (Double) momentumSpinner.getValue());
+            network.initialize(topology, (Double) learningSPinner.getValue(), (Double) momentumSpinner.getValue());
 
-            NeuralNetworkThread networkThread = new NeuralNetworkThread(network, trainData, testData, this);
+            NeuralNetworkThread networkThread = new NeuralNetworkThread(network, (Double) errorSpinner.getValue(), (Integer) iterationsSpinner.getValue(), trainData, testData, this);
             networkThread.start();
         }
         catch(IllegalArgumentException e)
@@ -222,6 +240,36 @@ public class GuiForm extends JFrame
             returnList.add(DataSet.DataType.Word9);
 
         return returnList;
+    }
+
+    private List<DataSet.DataType> getDataTypesToTest()
+    {
+        java.util.List<DataSet.DataType> returnList = new ArrayList<>();
+
+        if (vowelATestCheckBox.isSelected())
+            returnList.add(DataSet.DataType.VowelA);
+
+        if (vowelOTestCheckBox.isSelected())
+            returnList.add(DataSet.DataType.VowelO);
+
+        return returnList;
+    }
+
+    public java.util.List<Integer> getHiddenLayerTopology()
+    {
+        java.util.List<Integer> topologyList = new ArrayList<>();
+
+        String topologyStr = hiddenLayerTopology.getText().trim();
+
+        if (topologyStr.length() == 0)
+            return topologyList;
+
+        String[] topologyArray = topologyStr.split(" ");
+
+        for (String str: topologyArray)
+            topologyList.add(Integer.parseInt(str));
+
+        return topologyList;
     }
 
     public void setEnabledInterface(boolean bool)

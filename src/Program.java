@@ -12,8 +12,6 @@ import java.util.Scanner;
  */
 public class Program
 {
-    private String ENUM_NORMAL_EXECUTION = "normal";
-    private String ENUM_VOGAL_EXECUTION = "vogal1";
     private Scanner m_input = new Scanner(System.in).useLocale(Locale.US);
 
     private String m_trainPath, m_testPath;
@@ -55,20 +53,34 @@ public class Program
         //testData.toFile("data/new_test.txt");
 
         // Get what we want:
+        /*
         DataSet trainData2 = new DataSet(trainData.filterByType(Arrays.asList(DataSet.DataType.Number4)));
         DataSet trainData3 = new DataSet(trainData.groupAtributesBySubjectID(Arrays.asList(DataSet.DataType.VowelA, DataSet.DataType.VowelO)));
         DataSet trainData4 = new DataSet(trainData.groupAtributesBySubjectID(Arrays.asList(DataSet.DataType.VowelA, DataSet.DataType.VowelO)));
-        DataSet testData2 = new DataSet(testData.filterByType(Arrays.asList(DataSet.DataType.VowelA)));
+        DataSet trainData5 = new DataSet(trainData.filterByType(Arrays.asList(DataSet.DataType.VowelA, DataSet.DataType.VowelO, DataSet.DataType.VowelU)));
+        DataSet testData5 = new DataSet(testData.filterByType(Arrays.asList(DataSet.DataType.VowelA, DataSet.DataType.VowelO, DataSet.DataType.VowelU)));
         DataSet testData4 = new DataSet(testData.selectOneSamplePerDataType());
         testData4 = new DataSet(testData4.groupAtributesBySubjectID(Arrays.asList(DataSet.DataType.VowelA, DataSet.DataType.VowelO)));
+        */
+
+        //trainData = new DataSet(trainData.filterByType(Arrays.asList(DataSet.DataType.VowelA, DataSet.DataType.VowelO)));
+        //testData = new DataSet(testData.filterByType(Arrays.asList(DataSet.DataType.VowelA, DataSet.DataType.VowelO)));
 
         NeuralNetwork network = new NeuralNetwork();
-        network.initialize(Arrays.asList(trainData2.getNumAttributes(), 29, 29, 2), m_learningRate, m_momentum);
-
-        network.train(trainData2, m_maxError, m_maxIterations);
+        network.initialize(Arrays.asList(trainData.getNumAttributes(), 10, 10, 2), m_learningRate, m_momentum);
+        network.train(trainData, m_maxError, m_maxIterations);
         ClassificationReport testReport = network.test(testData);
+        System.out.println(testReport);
+        /*
+        network.initialize(Arrays.asList(trainData5.getNumAttributes(), 2), m_learningRate, m_momentum);
+
+        network.train(trainData5, m_maxError, m_maxIterations);
+        ClassificationReport testReport = network.test(trainData5);
+        ClassificationReport testReport2 = network.test(testData5);
 
         System.out.println(testReport);
+        System.out.println(testReport2);
+        */
     }
 
     public static void main(String[] args)

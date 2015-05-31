@@ -38,6 +38,11 @@ public class Connection
         return m_deltaWeight;
     }
 
+    public void setWeight(Double weight)
+    {
+        m_weight = weight;
+    }
+
     public void updateWeight(Double weight)
     {
         // The weight from past iteration becomes the weight from past-past iteration, etc...

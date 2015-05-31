@@ -49,15 +49,17 @@ public class NeuralNetwork
     public void train(DataSet trainData, double desiredError, int maxIterations)
     {
         ClassificationReport reportTrain;
-        List<Example> m_shuffledExamples = new ArrayList<>(trainData.getExamples());
         int iteration = 0;
+
+        List<Example> m_shuffledTrainExamples = new ArrayList<>(trainData.getExamples());
 
         do
         {
             // Randomize examples:
-            Collections.shuffle(m_shuffledExamples);
+            Collections.shuffle(m_shuffledTrainExamples);
+
             // Propagate:
-            for (Example example : m_shuffledExamples)
+            for (Example example : m_shuffledTrainExamples)
             {
                 feedForward(example.getAttributes());
                 backPropagate(example.getTargetList());
@@ -67,13 +69,11 @@ public class NeuralNetwork
 
             reportTrain = getClassificationReport(trainData);
 
-            System.out.println("Iter " + iteration + " c/ erro " + reportTrain.getMSE());
+            System.out.println("Iteration " + iteration + " with MSE " + reportTrain.getMSE() +
+                    " | " + "Parkinson: " + reportTrain.getDetectedParkinson() + "/" + reportTrain.getTotalParkinson() +
+                    " | " + "Healthy: " + reportTrain.getDetectedHealthy() + "/" + reportTrain.getTotalHealthy());
 
         } while(reportTrain.getMSE() > desiredError && iteration < maxIterations);
-
-        // Check current error:
-        double finalError = reportTrain.getMSE();
-        System.out.println("MSE: " + finalError);
     }
 
     public ClassificationReport test(DataSet data)
@@ -97,17 +97,17 @@ public class NeuralNetwork
 
             if (example.getDataClass() == DataSet.DataClass.PARKINSON)
             {
-                report.incTotalPositives();
+                report.incTotalParkinson();
 
                 if (parkinsonOutput >= healthyOutput)
-                    report.incTruePositives();
+                    report.incDetectedParkinson();
             }
             else
             {
-                report.incTotalNegatives();
+                report.incTotalHealthy();
 
                 if (parkinsonOutput < healthyOutput)
-                    report.incTrueNegatives();
+                    report.incDetectedHealthy();
             }
         }
 

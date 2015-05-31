@@ -1,10 +1,7 @@
 package data;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -174,6 +171,59 @@ public class DataSet
 
         return returnExamples;
     }
+
+    /*
+    public DataSet getSubsetAndLeaveRest(double percentage)
+    {
+        List<Example> returnExamples = new ArrayList<>();
+        List<Example> newExamples = new ArrayList<>();
+        List<Integer> subjectIDParkinsonStay = new ArrayList<>();
+        List<Integer> subjectIDHealthyStay = new ArrayList<>();
+        List<Integer> subjectIDRemove = new ArrayList<>();
+        Random rnd = new Random();
+
+        // Get subject IDs from the examples:
+        for (Example example: m_examples)
+        {
+            if (example.getDataClass() == DataClass.PARKINSON)
+            {
+                if (!subjectIDParkinsonStay.contains(example.getSubjectID()))
+                    subjectIDParkinsonStay.add(example.getSubjectID());
+            }
+            else
+            {
+                if (!subjectIDHealthyStay.contains(example.getSubjectID()))
+                    subjectIDHealthyStay.add(example.getSubjectID());
+            }
+        }
+
+        int valuePerClass = (int) (percentage * subjectIDParkinsonStay.size());
+
+        for(int i=0; i < valuePerClass; i++)
+        {
+            Integer parkinsonID = subjectIDParkinsonStay.get(rnd.nextInt(subjectIDParkinsonStay.size()));
+            Integer healthyID = subjectIDHealthyStay.get(rnd.nextInt(subjectIDHealthyStay.size()));
+
+            subjectIDParkinsonStay.remove(parkinsonID);
+            subjectIDHealthyStay.remove(healthyID);
+
+            subjectIDRemove.add(parkinsonID);
+            subjectIDRemove.add(healthyID);
+        }
+
+        for (Example example: m_examples)
+        {
+            if (subjectIDRemove.contains(example.getSubjectID()))
+                returnExamples.add(example);
+            else
+                newExamples.add(example);
+        }
+
+        // Update current examples and return the rest:
+        m_examples = newExamples;
+        return new DataSet(returnExamples);
+    }
+    */
 
     public List<Example> getExamples()
     {
